@@ -8,11 +8,11 @@ Swagger UI: `/api-docs`
 
 | Metod | Yo'l | Auth | Tavsif |
 |---|---|---|---|
-| POST | /register | - | Ro'yxatdan o'tish |
-| POST | /login | - | Kirish, JWT token |
-| GET | /users | - | Foydalanuvchilar ro'yxati |
-| POST | /files | Bearer | Video yuklash (form-data: `title`, `description`, `videoFile`, `thumbnail`) |
-| GET | /files | - | Videolar ro'yxati (`?page=&limit=&search=`) |
+| POST | /register | - | Ro'yxatdan o'tish (`username`, `password`, avatar rasm ixtiyoriy; form-data yoki JSON) |
+| POST | /login | - | Kirish (`username`, `password`), JWT token |
+| GET | /users | - | Foydalanuvchilar ro'yxati (`id`, `username`, `avatarUrl`, `videosCount`) |
+| POST | /files | Bearer | Video yuklash (form-data: `title`, video fayl — maydon nomi ixtiyoriy, `thumbnail` ixtiyoriy) |
+| GET | /files | - | Videolar ro'yxati (`?search=&userId=&page=&limit=`) |
 | PUT | /files?id=ID | Bearer | Sarlavha/tavsifni yangilash (`/files/ID` ham ishlaydi) |
 | DELETE | /files?id=ID | Bearer | Videoni o'chirish (`/files/ID` ham ishlaydi) |
 | GET | /files/my | Bearer | Mening videolarim |

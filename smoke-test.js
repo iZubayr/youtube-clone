@@ -9,33 +9,46 @@ const j = async (r) => ({ status: r.status, body: await r.json().catch(() => nul
   let r = await j(await fetch(`${B}/health`));
   log('health', r.status === 200);
 
-  r = await j(await fetch(`${B}/api/v1/register`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'tester', email: 'T@x.com', password: 'secret1' }),
-  }));
-  log('register', r.status === 201);
+  // Frontend kabi: username + password + avatar (multipart), email yo'q
+  let rf = new FormData();
+  rf.append('username', 'Tester');
+  rf.append('password', '1234');
+  rf.append('avatar', new Blob(['AVATARDATA'], { type: 'image/png' }), 'me.png');
+  r = await j(await fetch(`${B}/api/v1/register`, { method: 'POST', body: rf }));
+  const avatarUrl = r.body && r.body.user && r.body.user.avatarUrl;
+  log('register (multipart + avatar)', r.status === 201 && !!avatarUrl, avatarUrl || JSON.stringify(r.body));
+
+  const av = await fetch(avatarUrl);
+  log('avatar ochiladi', av.status === 200 && (await av.text()) === 'AVATARDATA');
 
   r = await j(await fetch(`${B}/register`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'tester', email: 't@x.com', password: 'secret1' }),
+    body: JSON.stringify({ username: 'tester', password: '1234' }),
   }));
-  log('register duplicate -> 409', r.status === 409);
+  log('register duplicate (katta-kichik harf) -> 409', r.status === 409);
+
+  r = await j(await fetch(`${B}/register`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: 'jsonuser', password: '1234' }),
+  }));
+  log('register JSON, avatarsiz', r.status === 201 && r.body.user.avatarUrl === null);
 
   r = await j(await fetch(`${B}/login`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 't@x.com', password: 'secret1' }),
+    body: JSON.stringify({ username: 'tester', password: '1234' }),
   }));
   const token = r.body && r.body.token;
-  log('login', r.status === 200 && !!token);
+  const myId = r.body && r.body.user && r.body.user.id;
+  log('login (username)', r.status === 200 && !!token);
 
   r = await j(await fetch(`${B}/login`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 't@x.com', password: 'wrong' }),
+    body: JSON.stringify({ username: 'tester', password: 'wrong' }),
   }));
   log('login wrong -> 401', r.status === 401);
 
   r = await j(await fetch(`${B}/users`));
-  log('users', r.status === 200 && r.body.total === 1 && !r.body.data[0].email);
+  log('users (avatarUrl bor, email yo\'q)', r.status === 200 && r.body.total === 2 && !('email' in r.body.data[0]) && r.body.data.some((u) => u.avatarUrl));
 
   const auth = { Authorization: `Bearer ${token}` };
 
@@ -48,7 +61,7 @@ const j = async (r) => ({ status: r.status, body: await r.json().catch(() => nul
   fd = new FormData();
   fd.append('title', 'Birinchi video');
   fd.append('description', 'test');
-  fd.append('videoFile', new Blob(['FAKEVIDEODATA'], { type: 'video/mp4' }), 'a.mp4');
+  fd.append('file', new Blob(['FAKEVIDEODATA'], { type: 'video/mp4' }), 'a.mp4'); // maydon nomi ixtiyoriy
   fd.append('thumbnail', new Blob(['PNGDATA'], { type: 'image/png' }), 't.png');
   r = await j(await fetch(`${B}/files`, { method: 'POST', headers: auth, body: fd }));
   const f = r.body && r.body.file;
@@ -61,7 +74,11 @@ const j = async (r) => ({ status: r.status, body: await r.json().catch(() => nul
   log('upload non-video -> 400', r.status === 400, r.body && r.body.message);
 
   r = await j(await fetch(`${B}/files?search=birinchi`));
-  log('list+search', r.status === 200 && r.body.total === 1);
+  log('list+search (owner avatar bilan)', r.status === 200 && r.body.total === 1 && r.body.data[0].owner.username === 'Tester' && !!r.body.data[0].owner.avatarUrl && r.body.data[0].size > 0);
+
+  r = await j(await fetch(`${B}/files?userId=${myId}`));
+  const r2 = await j(await fetch(`${B}/files?userId=boshqa-id`));
+  log('userId filtri', r.body.total === 1 && r2.body.total === 0);
 
   r = await j(await fetch(`${B}/files/my`, { headers: auth }));
   log('files/my', r.status === 200 && r.body.total === 1);

@@ -19,25 +19,45 @@ paths:
     post:
       tags: [Auth]
       summary: Yangi foydalanuvchini ro'yxatdan o'tkazish
+      description: Username + parol + avatar rasm (ixtiyoriy). multipart/form-data yoki JSON.
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
-              required: [username, email, password]
+              required: [username, password]
               properties:
                 username:
                   type: string
                   example: jhon_doe
-                email:
-                  type: string
-                  format: email
-                  example: jhon@example.com
                 password:
                   type: string
                   format: password
-                  example: StrongPass123!
+                  example: "1234"
+                avatar:
+                  type: string
+                  format: binary
+                  description: Avatar rasm (ixtiyoriy, maydon nomi ahamiyatsiz)
+                email:
+                  type: string
+                  format: email
+                  description: Ixtiyoriy
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: jhon_doe
+                password:
+                  type: string
+                  format: password
+                  example: "1234"
+                email:
+                  type: string
+                  format: email
       responses:
         '201':
           description: Foydalanuvchi yaratildi (token ham qaytadi)
@@ -56,19 +76,18 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, password]
+              required: [username, password]
               properties:
-                email:
+                username:
                   type: string
-                  format: email
-                  example: jhon@example.com
+                  example: jhon_doe
                 password:
                   type: string
                   format: password
-                  example: StrongPass123!
+                  example: "1234"
       responses:
         '200':
-          description: Muvaffaqiyatli kirildi
+          description: Muvaffaqiyatli kirildi (token + user)
           content:
             application/json:
               schema:
@@ -128,10 +147,14 @@ paths:
           schema: { type: integer, default: 1 }
         - name: limit
           in: query
-          schema: { type: integer, default: 10 }
+          schema: { type: integer, default: 50 }
         - name: search
           in: query
           schema: { type: string }
+        - name: userId
+          in: query
+          schema: { type: string }
+          description: Faqat shu foydalanuvchining videolari (chap menyudagi kanal bosilganda)
       responses:
         '200':
           description: Videolar ro'yxati
