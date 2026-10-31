@@ -3,12 +3,13 @@ const jwt = require('jsonwebtoken');
 const { users, newId } = require('../utils/store');
 const storage = require('../utils/storage');
 const serializeUser = require('../utils/serializeUser');
+const config = require('../config');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function signToken(user) {
-  return jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  return jwt.sign({ id: user.id }, config.JWT_SECRET, {
+    expiresIn: config.JWT_EXPIRES_IN,
   });
 }
 

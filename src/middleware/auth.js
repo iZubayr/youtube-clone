@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { users } = require('../utils/store');
+const config = require('../config');
 
 module.exports = function auth(req, res, next) {
   try {
@@ -9,7 +10,7 @@ module.exports = function auth(req, res, next) {
       return res.status(401).json({ message: 'Token topilmadi. Avval tizimga kiring.' });
     }
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, config.JWT_SECRET);
     const user = users.find((u) => u.id === payload.id);
     if (!user) {
       // Server qayta ishga tushgan bo'lsa, eski token egasi endi yo'q

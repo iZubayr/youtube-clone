@@ -10,21 +10,12 @@ const swaggerUi = require('swagger-ui-express');
 const routes = require('./src/routes');
 const { notFound, errorHandler } = require('./src/middleware/error');
 
-// JWT_SECRET berilmasa, vaqtinchalik tasodifiy kalit yaratiladi
-// (server qayta ishga tushganda baribir hamma ma'lumot tozalanadi).
-if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = require('crypto').randomBytes(32).toString('hex');
-}
-
 const app = express();
 
 // Render proxy orqasida ishlaydi (https va host to'g'ri aniqlansin)
 app.set('trust proxy', 1);
 
-const origins = process.env.CORS_ORIGIN && process.env.CORS_ORIGIN !== '*'
-  ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
-  : '*';
-app.use(cors({ origin: origins }));
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // Render health check va UptimeRobot uchun

@@ -2,8 +2,9 @@ const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
 const { UPLOAD_DIR } = require('../utils/storage');
+const config = require('../config');
 
-const maxMb = Number(process.env.MAX_FILE_MB) || 100;
+const maxMb = config.MAX_FILE_MB;
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
