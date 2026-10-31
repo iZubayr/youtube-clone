@@ -4,8 +4,10 @@ info:
   description: YouTube klon loyihasi uchun backend API hujjatlari.
   version: 1.0.0
 servers:
+  - url: https://video-api-clone-6ac48.containers.snapdeploy.app/api/v1
+    description: Production (SnapDeploy)
   - url: /api/v1
-    description: Joriy server
+    description: Joriy server (lokal)
 tags:
   - name: Auth
     description: Foydalanuvchi autentifikatsiyasi

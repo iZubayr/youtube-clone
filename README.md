@@ -4,6 +4,14 @@ Express. Baza yo'q: userlar va videolar yozuvi server xotirasida, video fayllar 
 saqlanadi. **Server o'chib-yonganda (uxlab uyg'onganda, qayta deploy) hammasi tozalanadi.**
 Swagger UI: `/api-docs`
 
+## Jonli server (SnapDeploy)
+
+Base URL: `https://video-api-clone-6ac48.containers.snapdeploy.app/api/v1`
+
+- Swagger UI: https://video-api-clone-6ac48.containers.snapdeploy.app/api-docs
+- Health: https://video-api-clone-6ac48.containers.snapdeploy.app/health
+- Misol: `GET https://video-api-clone-6ac48.containers.snapdeploy.app/api/v1/users`
+
 ## Endpointlar
 
 | Metod | Yo'l | Auth | Tavsif |

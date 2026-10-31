@@ -1,5 +1,9 @@
-// Tezkor sinov: node smoke-test.js  (server ishlab turganda). Port: PORT yoki 5055
-const B = `http://localhost:${process.env.PORT || 5055}`;
+// Tezkor sinov (server ishlab turganda):
+//   node smoke-test.js                      -> lokal (http://localhost:PORT, PORT yoki 5055)
+//   node smoke-test.js https://video-api-clone-6ac48.containers.snapdeploy.app   -> production
+// Diqqat: production'da sinov test akkaunt yaratadi va "users soni 2 ta" tekshiruvi
+// serverda boshqa userlar bo'lsa FAIL beradi.
+const B = (process.argv[2] || `http://localhost:${process.env.PORT || 5055}`).replace(/\/+$/, '');
 const j = async (r) => ({ status: r.status, body: await r.json().catch(() => null) });
 
 (async () => {
