@@ -1,0 +1,222 @@
+openapi: 3.0.3
+info:
+  title: YouTube Clone API
+  description: YouTube klon loyihasi uchun backend API hujjatlari.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Joriy server
+tags:
+  - name: Auth
+    description: Foydalanuvchi autentifikatsiyasi
+  - name: Users
+    description: Foydalanuvchilar bilan ishlash
+  - name: Files
+    description: Video fayllar bilan ishlash
+
+paths:
+  /register:
+    post:
+      tags: [Auth]
+      summary: Yangi foydalanuvchini ro'yxatdan o'tkazish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email, password]
+              properties:
+                username:
+                  type: string
+                  example: jhon_doe
+                email:
+                  type: string
+                  format: email
+                  example: jhon@example.com
+                password:
+                  type: string
+                  format: password
+                  example: StrongPass123!
+      responses:
+        '201':
+          description: Foydalanuvchi yaratildi (token ham qaytadi)
+        '400':
+          description: Yaroqsiz ma'lumotlar
+        '409':
+          description: Email yoki username band
+
+  /login:
+    post:
+      tags: [Auth]
+      summary: Tizimga kirish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: jhon@example.com
+                password:
+                  type: string
+                  format: password
+                  example: StrongPass123!
+      responses:
+        '200':
+          description: Muvaffaqiyatli kirildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Email yoki parol noto'g'ri
+
+  /users:
+    get:
+      tags: [Users]
+      summary: Barcha foydalanuvchilar ro'yxati
+      responses:
+        '200':
+          description: Foydalanuvchilar ro'yxati
+
+  /files:
+    post:
+      tags: [Files]
+      summary: Yangi video yuklash
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [title, videoFile]
+              properties:
+                title:
+                  type: string
+                  example: Mening birinchi videom
+                description:
+                  type: string
+                videoFile:
+                  type: string
+                  format: binary
+                thumbnail:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Video yuklandi
+        '400':
+          description: Xato ma'lumot yoki fayl
+        '401':
+          description: Avtorizatsiyadan o'tilmagan
+    get:
+      tags: [Files]
+      summary: Barcha videolar ro'yxati (public)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 10 }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Videolar ro'yxati
+    put:
+      tags: [Files]
+      summary: Video sarlavhasini yangilash
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+          description: Video ID si (yoki PUT /files/{id})
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Yangilandi
+        '403':
+          description: Bu video sizga tegishli emas
+        '404':
+          description: Video topilmadi
+    delete:
+      tags: [Files]
+      summary: Videoni o'chirish
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: string }
+          description: Video ID si (yoki DELETE /files/{id})
+      responses:
+        '200':
+          description: O'chirildi
+        '403':
+          description: Bu video sizga tegishli emas
+        '404':
+          description: Video topilmadi
+
+  /files/my:
+    get:
+      tags: [Files]
+      summary: Mening videolarim
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Foydalanuvchining videolari
+        '401':
+          description: Avtorizatsiyadan o'tilmagan
+
+  /download/{fileName}:
+    get:
+      tags: [Files]
+      summary: Faylni yuklab olish (public)
+      parameters:
+        - name: fileName
+          in: path
+          required: true
+          schema: { type: string }
+        - name: inline
+          in: query
+          schema: { type: string }
+          description: Berilsa, fayl yuklab olinmasdan brauzerda ochiladi (video player uchun)
+      responses:
+        '200':
+          description: Fayl
+        '404':
+          description: Fayl topilmadi
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
