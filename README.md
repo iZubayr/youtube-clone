@@ -48,8 +48,3 @@ Render bepul servisi 15 daqiqa so'rov bo'lmasa uxlaydi va ma'lumotlar tozalanadi
 https://uptimerobot.com da HTTP monitor yarating: `https://NOM.onrender.com/health`, har 5 daqiqada.
 Render serverni ba'zan o'zi ham qayta ishga tushiradi, shunda ma'lumotlar baribir yo'qoladi.
 Vazifani topshirishdan oldin yangi akkaunt va video bilan tekshirib oling.
-
-## Ixtiyoriy: ma'lumotlar uzoqroq saqlansin
-
-Videolar uchun Cloudinary (bepul) ulash mumkin: `CLOUDINARY_URL` ni Render Environment'ga qo'shing.
-Userlar va sarlavhalar xotirada qoladi, shuning uchun to'liq saqlash uchun MongoDB kerak bo'ladi.
